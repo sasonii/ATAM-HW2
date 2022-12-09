@@ -42,7 +42,7 @@ read_file_func:
 read_word:
 	# setting place for chars in the stack
 	mov %rsp, %r15
-	sub $25, %rsp	
+	sub $280, %rsp	
 
 	# setting vars
 	xor %r9, %r9 #holds the number 
@@ -62,8 +62,15 @@ read_char:
 	
 	cmpb %r12b, (%rsp)	
 	je end_of_word
+	
+	cmpb $0x45, (%rsp)
+	je set_negative
 
 	add $1, %rsp
+	jmp read_char
+
+set_negative:
+	mov $1, %r10
 	jmp read_char
 	
 end_of_word:
@@ -82,8 +89,8 @@ end_of_word:
 	pushq %r10
 	
 	# call atam_atol with regs
-	movq %rsp, %rdi
-	sub $25, %rdi
+	movq %r15, %rdi
+	sub $280, %rdi
 	call atam_atol
 	
 	# restore regs
@@ -92,9 +99,19 @@ end_of_word:
 	popq %r8
 	popq %rdi 
 	
-	# check number 
-	cmpl %eax, %r9d
-	jle read_word
+	# check number
+	cmpq $1, %r10
+	je check_negative_end_word
+	
+	cmpl %eax, %r13d
+	jge read_word
+	inc %r8
+	jmp read_word
+
+check_negative_end_word:
+	imul $-1, %eax
+	cmpl %eax, %r13d
+	jge read_word
 	inc %r8
 	jmp read_word
 	
@@ -105,7 +122,7 @@ end_of_file:
 	# get number from chars
 	
 	#restore rsp for next word
-	mov %rsp, %r15
+	mov %r15, %rsp
 	
 	# save regs
 	pushq %rdi 
@@ -114,8 +131,8 @@ end_of_file:
 	pushq %r10
 	
 	# call atam_atol with regs
-	movq %rsp, %rdi
-	sub $25, %rdi
+	movq %r15, %rdi
+	sub $280, %rdi
 	call atam_atol
 	
 	# restore regs
@@ -125,9 +142,20 @@ end_of_file:
 	popq %rdi 
 	
 	# check number
-	cmpl %eax, %r9d
-	jle end_of_file_continue
-	inc %r8	
+	cmpq $1, %r10
+	je check_negative_end_of_file
+	cmpl %eax, %r13d
+	jge end_of_file_continue
+	inc %r8
+	jmp end_of_file_continue
+	
+
+check_negative_end_of_file:
+	imul $-1, %eax
+	cmpl %eax, %r13d
+	jge end_of_file_continue
+	inc %r8
+	jmp end_of_file_continue
 	
 end_of_file_continue:	
 		
