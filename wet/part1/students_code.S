@@ -38,11 +38,11 @@ read_file_func:
 	xor %rbx, %rbx
 	
 	xor %r8, %r8 #holds number of numbers greater than limit
-
+	movq %rax, %rdi # first param - file descriptor
 read_word:
 	# setting place for chars in the stack
-	pushq %rsp
-	sub $20, %rsp	
+	mov %rsp, %r15
+	sub $25, %rsp	
 
 	# setting vars
 	xor %r9, %r9 #holds the number 
@@ -50,38 +50,30 @@ read_word:
 	
 read_char:
 	# sys_read
-	movq %rax, %rdi # first param - file descriptor
+	
 	movq %rsp, %rsi # second param - pointer to array
 	movq $1, %rdx  # third param - number of chars to read
 	mov $0, %rax # sys_read
 	syscall # ??? save file descriptor restore file descriptor ???
 	
-	# SYS_LSEEK - NOTE: rdi holds fd
-	mov     $19, %rax # SYS_LSEEK
-	mov     $1, %rsi 
-	mov     $1, %rdx   # offset should be from the current position
-	syscall
 	
 	cmpb $0x00, (%rsp)
-	add $1, %rsp
 	je end_of_file
 	
-	sub $1, %rsp
-	cmpb %r12b, (%rsp)
-	add $1, %rsp
+	cmpb %r12b, (%rsp)	
 	je end_of_word
-	
+
+	add $1, %rsp
 	jmp read_char
 	
 end_of_word:
 	# insert null terminator
-	sub $1, %rsp
 	movb $0x00, (%rsp)
 	
 	# get number from chars
 	
 	#restore rsp for next word
-	popq %rsp
+	mov %r15, %rsp
 	
 	# save regs
 	pushq %rdi 
@@ -91,7 +83,7 @@ end_of_word:
 	
 	# call atam_atol with regs
 	movq %rsp, %rdi
-	sub $20, %rdi
+	sub $25, %rdi
 	call atam_atol
 	
 	# restore regs
@@ -108,13 +100,12 @@ end_of_word:
 	
 end_of_file:
 	# insert null terminator
-	sub $1, %rsp
 	movb $0x00, (%rsp)
 	
 	# get number from chars
 	
 	#restore rsp for next word
-	popq %rsp
+	mov %rsp, %r15
 	
 	# save regs
 	pushq %rdi 
@@ -124,7 +115,7 @@ end_of_file:
 	
 	# call atam_atol with regs
 	movq %rsp, %rdi
-	sub $20, %rdi
+	sub $25, %rdi
 	call atam_atol
 	
 	# restore regs
@@ -139,12 +130,7 @@ end_of_file:
 	inc %r8	
 	
 end_of_file_continue:	
-	# SYS_LSEEK - NOTE: rdi holds fd
-	mov     $19, %rax # SYS_LSEEK
-	mov     $0, %rsi 
-	mov     $0, %rdx   # offset should be from the current position
-	syscall	
-	
+		
 	#sys_close
 	mov $3, %rax # sys_read
 	syscall # note that rdi holds file descriptor
