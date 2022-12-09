@@ -109,7 +109,7 @@ end_of_word:
 	
 end_of_file:
 	# insert null terminator
-	sub $1, %rspb
+	sub $1, %rsp
 	movb $0x00, (%rsp)
 	
 	# get number from chars
