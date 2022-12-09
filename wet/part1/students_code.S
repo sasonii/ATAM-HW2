@@ -54,14 +54,14 @@ read_char:
 	# sys_read
 	movq %rax, %rdi # first param - file descriptor
 	movq %rsp, %rsi # second param - pointer to array
-	movq $1, $rdx  # third param - number of chars to read
+	movq $1, %rdx  # third param - number of chars to read
 	mov $0, %rax # sys_read
 	syscall # ??? save file descriptor restore file descriptor ???
 	
 	# SYS_LSEEK - NOTE: rdi holds fd
 	mov     $19, %rax # SYS_LSEEK
 	mov     $1, %rsi 
-	mov     $1, rdx,   # offset should be from the current position
+	mov     $1, %rdx   # offset should be from the current position
 	syscall
 	
 	add $1, %rsp
@@ -76,7 +76,7 @@ read_char:
 	
 end_of_word:
 	# insert null terminator
-	sub %1, %rsp
+	sub $1, %rsp
 	movb $0x00, (%rsp)
 	
 	# get number from chars
@@ -109,7 +109,7 @@ end_of_word:
 	
 end_of_file:
 	# insert null terminator
-	sub %1, %rsp
+	sub $1, %rsp
 	movb $0x00, (%rsp)
 	
 	# get number from chars
@@ -143,7 +143,7 @@ end_of_file:
 	# SYS_LSEEK - NOTE: rdi holds fd
 	mov     $19, %rax # SYS_LSEEK
 	mov     $0, %rsi 
-	mov     $0, rdx,   # offset should be from the current position
+	mov     $0, %rdx   # offset should be from the current position
 	syscall	
 	
 	#sys_close
