@@ -134,12 +134,12 @@ end_of_file:
 	pushq %r8
 	popq %rdi 
 	
-	# check number 
-	movq %r8, %rdx
-	inc %rdx # value if the last number is greater than limit
-	cmpl %r9d, %eax
-	cmovg %eax, %r8
+	# check number
+	cmpl %eax, %r9d
+	jle end_of_file_continue
+	inc %r8	
 	
+end_of_file_continue:	
 	# SYS_LSEEK - NOTE: rdi holds fd
 	mov     $19, %rax # SYS_LSEEK
 	mov     $0, %rsi 
