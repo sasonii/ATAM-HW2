@@ -68,7 +68,7 @@ read_char:
 	add $1, %rsp
 	je end_of_file
 	
-	sub $1 %rsp
+	sub $1, %rsp
 	cmpb %r12b, (%rsp)
 	add $1, %rsp
 	je end_of_word
