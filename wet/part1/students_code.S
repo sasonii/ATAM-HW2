@@ -41,7 +41,6 @@ read_file_func:
 
 read_word:
 	
-	
 	# setting place for chars in the stack
 	pushq %rsp
 	sub $20, %rsp	
@@ -129,9 +128,9 @@ end_of_file:
 	call atam_atol
 	
 	# restore regs
-	pushq %r10
-	pushq %r9
-	pushq %r8
+	popq %r10
+	popq %r9
+	popq %r8
 	popq %rdi 
 	
 	# check number
