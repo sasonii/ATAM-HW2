@@ -96,9 +96,9 @@ end_of_word:
 	call atam_atol
 	
 	# restore regs
-	pushq %r10
-	pushq %r9
-	pushq %r8
+	popq %r10
+	popq %r9
+	popq %r8
 	popq %rdi 
 	
 	# check number 
@@ -109,7 +109,7 @@ end_of_word:
 	
 end_of_file:
 	# insert null terminator
-	sub $1, %rsp
+	sub $1, %rspb
 	movb $0x00, (%rsp)
 	
 	# get number from chars
