@@ -62,8 +62,6 @@ read_char:
 	mov     $1, %rdx   # offset should be from the current position
 	syscall
 	
-	add $1, %rsp
-	
 	cmpb $0x00, (%rsp)
 	add $1, %rsp
 	je end_of_file
