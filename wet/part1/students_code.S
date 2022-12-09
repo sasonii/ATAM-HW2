@@ -40,7 +40,6 @@ read_file_func:
 	xor %r8, %r8 #holds number of numbers greater than limit
 
 read_word:
-	
 	# setting place for chars in the stack
 	pushq %rsp
 	sub $20, %rsp	
@@ -65,10 +64,10 @@ read_char:
 	
 	add $1, %rsp
 	
-	cmpb $0x00, %r14b
+	cmpb $0x00, (%rsp)
 	je end_of_file
 	
-	cmpb %r12b, %r14b
+	cmpb %r12b, (%rsp)
 	je end_of_word
 	
 	jmp read_char
