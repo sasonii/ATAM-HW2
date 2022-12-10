@@ -37,6 +37,7 @@ my_ili_handler:
 	call what_to_do
 	cmpq $0, %rax
 	je old_handler
+	addq $2, 120(%rsp)
 	jmp new_handler
 
 one_byte_func:
@@ -46,6 +47,7 @@ one_byte_func:
 	call what_to_do
 	cmpq $0, %rax
 	je old_handler
+	addq $1, 120(%rsp)
 	jmp new_handler
 
 old_handler:
@@ -87,9 +89,7 @@ new_handler:
 	popq %rdx
 	popq %rcx
 	popq %rbx
-	popq %rax
-	
-	addq $2, (%rsp) 
+	popq %rax 
 	
 end_func:
 	iretq
