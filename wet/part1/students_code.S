@@ -39,18 +39,20 @@ read_file_func:
 	
 	xor %r8, %r8 #holds number of numbers greater than limit
 	movq %rax, %rdi # first param - file descriptor
+	
 read_word:
 	# setting place for chars in the stack
 	mov %rsp, %r15
 	sub $280, %rsp	
-
+	
 	# setting vars
 	xor %r9, %r9 #holds the number 
-	xor %r10, %r10 # holds whether the number is negative
+	movq %r9, (%rsp)
+	movq %r9, 8(%rsp)
+	movl %r9d, 16(%rsp)
 	
 read_char:
-	# sys_read
-	
+	# sys_read	
 	movq %rsp, %rsi # second param - pointer to array
 	movq $1, %rdx  # third param - number of chars to read
 	mov $0, %rax # sys_read
@@ -62,15 +64,8 @@ read_char:
 	
 	cmpb %r12b, (%rsp)	
 	je end_of_word
-	
-	cmpb $0x45, (%rsp)
-	je set_negative
 
 	add $1, %rsp
-	jmp read_char
-
-set_negative:
-	mov $1, %r10
 	jmp read_char
 	
 end_of_word:
@@ -86,7 +81,6 @@ end_of_word:
 	pushq %rdi 
 	pushq %r8
 	pushq %r9
-	pushq %r10
 	
 	# call atam_atol with regs
 	movq %r15, %rdi
@@ -94,23 +88,11 @@ end_of_word:
 	call atam_atol
 	
 	# restore regs
-	popq %r10
 	popq %r9
 	popq %r8
 	popq %rdi 
 	
-	# check number
-	cmpq $1, %r10
-	je check_negative_end_word
-	
-	cmpl %eax, %r13d
-	jge read_word
-	inc %r8
-	jmp read_word
-
-check_negative_end_word:
-	imul $-1, %eax
-	cmpl %eax, %r13d
+	cmpq %rax, %r13
 	jge read_word
 	inc %r8
 	jmp read_word
@@ -128,7 +110,6 @@ end_of_file:
 	pushq %rdi 
 	pushq %r8
 	pushq %r9
-	pushq %r10
 	
 	# call atam_atol with regs
 	movq %r15, %rdi
@@ -136,26 +117,16 @@ end_of_file:
 	call atam_atol
 	
 	# restore regs
-	popq %r10
 	popq %r9
 	popq %r8
 	popq %rdi 
 	
 	# check number
-	cmpq $1, %r10
-	je check_negative_end_of_file
-	cmpl %eax, %r13d
+	cmpq %rax, %r13
 	jge end_of_file_continue
 	inc %r8
 	jmp end_of_file_continue
 	
-
-check_negative_end_of_file:
-	imul $-1, %eax
-	cmpl %eax, %r13d
-	jge end_of_file_continue
-	inc %r8
-	jmp end_of_file_continue
 	
 end_of_file_continue:	
 		
